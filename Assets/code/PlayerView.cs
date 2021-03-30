@@ -58,9 +58,9 @@ public class PlayerView : MonoBehaviour
 
         OffsetRayLen = (hitPoint.transform.localPosition - centerPoint.transform.localPosition).normalized;
 
-        // 预制三个视角
-        viewerProfiles = new Vector3[3] { cameraPoint.transform.localPosition, cameraPoint.transform.localPosition + OffsetRayLen, cameraPoint.transform.localPosition + OffsetRayLen * 2 };
-        hitProfiles = new Vector3[3] { hitPoint.transform.localPosition + OffsetRayLen * offSetMult, hitPoint.transform.localPosition + OffsetRayLen * (1 + offSetMult), hitPoint.transform.localPosition + OffsetRayLen * (2 + offSetMult) };
+        // 预制四个视角
+        viewerProfiles = new Vector3[4] {centerPoint.transform.localPosition, cameraPoint.transform.localPosition, cameraPoint.transform.localPosition + OffsetRayLen, cameraPoint.transform.localPosition + OffsetRayLen * 2 };
+        hitProfiles = new Vector3[4] {centerPoint.transform.localPosition, hitPoint.transform.localPosition + OffsetRayLen * offSetMult, hitPoint.transform.localPosition + OffsetRayLen * (1 + offSetMult), hitPoint.transform.localPosition + OffsetRayLen * (2 + offSetMult) };
         defaultV = 1;
         cameraPoint.transform.localPosition = viewerProfiles[defaultV];
     }
@@ -72,7 +72,6 @@ public class PlayerView : MonoBehaviour
         CameraLock();
         // 切换视角长度
         ChangeViewer();
-        CameraFollow(smoothTime);
     }
 
     void Update()
@@ -83,8 +82,15 @@ public class PlayerView : MonoBehaviour
         //TargetAngle();
         // 旋转摄像头
         RotateCamera();
-        // 检测摄像头遮挡
-        if (AvoidCrossWall())
+
+        // 检测第一人称 摄像头是否到达指定位置
+        if(defaultV == 0 && (playerCamera.transform.position == centerPoint.transform.position))
+        {
+            cameraPoint.transform.localPosition = viewerProfiles[defaultV];
+            hitPoint.transform.localPosition = hitProfiles[defaultV];
+        }
+        // 检测摄像头遮挡 //第一人称若达到指定位置，则不检查
+        else if (AvoidCrossWall())
         {
             /// <summary>
             /// 发生碰撞时 不能切换视角长度
@@ -103,7 +109,7 @@ public class PlayerView : MonoBehaviour
         if (Input.GetKeyDown("v"))
         {
             //修改defaultV，使viewerProfiles和hitProfiles数组在预制的多个元素进行切换
-            defaultV = (defaultV + 1) % 3;
+            defaultV = (defaultV + 1) % 4;
         }
     }
 
@@ -128,11 +134,27 @@ public class PlayerView : MonoBehaviour
                 // 碰撞检测点随之而动
                 hitPoint.transform.position = hit.point;
                 hitPoint.transform.localPosition += OffsetRayLen * offSetMult;
+                CameraFollow(smoothTime/3);
                 return false;
             }
             //改成true虽然能实时更新，但是镜头会乱跳
+            CameraFollow(smoothTime/3);
             return false;
         }
+        // 检测到第一人称时
+        if(defaultV == 0)
+        {
+            // 防止奔跑时摄像头不能到达正确位置
+            if((playerCamera.transform.position - centerPoint.transform.position).sqrMagnitude < 1)
+            {
+                CameraFollow(0);
+                return true;
+            }
+            // 切换为第一人称时为二倍速
+            CameraFollow(smoothTime/2);
+            return true;
+        }
+        CameraFollow(smoothTime);
         return true;
     }
     void CameraFollow(float time)
