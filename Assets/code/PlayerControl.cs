@@ -4,56 +4,41 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    public float speed;                     //移动速度
-    public float backSpeed;                 //往后退的速度
-    public float runSpeed;                  //跑的速度
-    private float runAcceleratTime;          //加速到跑需要的时间
-    public float maxStrength;               //最大体力值
-    public float recStrSpeed;               //恢复体力的速度
-    public float runReduceStr;              //跑步消耗的体力
-    public float waitForRecStrToRun;        //体力耗尽，恢复到多少的时候能跑
-
-    private bool runStrCheck = false;       //当前体力是否支持跑步
-    private float strength;                 //当前体力
-    private float runTime;                  //跑步加速度的时间
-    private Vector3 positionBufferBuffer;   //上上一帧的位置
-    private Vector3 positionBuffer;         //上一帧的位置
-    private bool runBuffer;                 //上一帧是否在跑动
-
     private float ws, ad;               //移动方向
-    private Vector3 dir, move;          //移动方向向量 最终移动计算结果
-    private bool backFlag, forwardFlag; //是否在往 后 前
-    private Vector3 dirNowBufferReduce; //上一帧是否有移动
+    public float moveSpeed = 2;         //移动速度
+
+    public float turnArroundSpeed = 10; //转身速度
+    private Quaternion dir; //移动方向向量 最终移动计算结果
+    private Vector3 move; //按键检测
+    private Transform modelT;
+    private Transform playerT;
+    private Transform dirObjT;
     // Start is called before the first frame update
     void Start()
     {
-        strength = maxStrength;
+        playerT = GameObject.Find("player").transform;
+        dirObjT = GameObject.Find("centerPoint").transform;
+        modelT = GameObject.Find("playerModel").transform;
     }
 
     // Update is called once per frame
     void Update()
     {
         KeyInput();
-        MoveAndRunAndTiptoe();
-        RecStrength();
-        //Debug.Log(strength);
     }
 
     void KeyInput()
     {
         ws = 0;
         ad = 0;
-        dirNowBufferReduce = positionBuffer - positionBufferBuffer;
         //移动输入事件
         if (Input.GetKey(KeyCode.W))
         {
             ws = 1;
-            forwardFlag = true;
         }
         if (Input.GetKey(KeyCode.S))
         {
             ws = -1;
-            backFlag = true;
         }
         if (Input.GetKey(KeyCode.A))
         {
@@ -63,87 +48,34 @@ public class PlayerControl : MonoBehaviour
         {
             ad = 1;
         }
-        //移动的方向
-        dir = new Vector3(ad, 0, ws).normalized;
-    }
-    void MoveAndRunAndTiptoe()
-    {
-        //跑步
-        if (Input.GetKey(KeyCode.LeftShift) && forwardFlag && (runStrCheck && runBuffer))
+
+        //让移动方向参考系 朝向视角方向为正面
+        move = new Vector3(ad, 0, ws).normalized;
+        dir = Quaternion.Euler(new Vector3(0, dirObjT.eulerAngles.y, dirObjT.eulerAngles.z) - playerT.eulerAngles).normalized;
+
+        //当按下方向键
+        if (move != Vector3.zero)
         {
-            //在移动的情况下
-            if(dirNowBufferReduce != Vector3.zero || dir != Vector3.zero)
+            //模型面朝向
+            if(move.z < 0)
             {
-                //加速过程
-                if (runTime < runAcceleratTime)
-                {
-                    runTime += Time.deltaTime;
-                }
-                move = dir * runSpeed * runTime * Time.deltaTime + dir * speed * Time.deltaTime;
-                strength -= runReduceStr;
-                runBuffer = true;
+                modelT.rotation = Quaternion.Lerp(modelT.rotation, Quaternion.AngleAxis(180 + dirObjT.localEulerAngles.y - 90 * move.x, Vector3.up), Time.deltaTime * turnArroundSpeed);
             }
-            //在静止的情况下
             else
             {
-                runTime = 0;
-                move = dir * runSpeed * runTime * Time.deltaTime;
-                runBuffer = false;
+                modelT.rotation = Quaternion.Lerp(modelT.rotation, Quaternion.AngleAxis(90 * move.x + dirObjT.localEulerAngles.y, Vector3.up), Time.deltaTime * turnArroundSpeed);
             }
         }
 
-        //走路
-        else
+        //奔跑
+        if(Input.GetKey(KeyCode.LeftShift) && (ws != 0 || ad != 0))
         {
-            //跑步后减速过程
-            if (runTime > 0)
-            {
-                runTime -= Time.deltaTime;
-            }
-            move = dir * speed * Time.deltaTime  + dir * runSpeed * runTime * Time.deltaTime;
-            runBuffer = false;
+            move *= 2;
         }
 
-        //判断是否在后退
-        if(backFlag)
-        {
-            move *= backSpeed;
-        }
-
-        //计算最终结果
-        this.gameObject.transform.Translate(move);
-
-        //上上一帧的位置
-        positionBufferBuffer = positionBuffer;
-        //上一帧的位置
-        positionBuffer = this.transform.position;
-
-
-        if (strength > 0)
-        {
-            runStrCheck = true;
-        }
-        else if (strength == 0)
-        {
-            runStrCheck = false;
-            runBuffer = false;
-        }
-        if (strength >= waitForRecStrToRun)
-        {
-            runBuffer = true;
-        }
+        //只允许y轴旋转
+        modelT.eulerAngles = new Vector3(0,modelT.eulerAngles.y,0);
+        //移动
+        playerT.Translate((dir * move) * moveSpeed * Time.deltaTime);
     }
-    void RecStrength()
-    {
-        if(strength > maxStrength)
-        {
-            strength = maxStrength;
-        }
-        else if(strength < 0)
-        {
-            strength = 0;
-        }
-        strength += recStrSpeed;
-    }
-
 }

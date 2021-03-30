@@ -72,6 +72,7 @@ public class PlayerView : MonoBehaviour
         CameraLock();
         // 切换视角长度
         ChangeViewer();
+        CameraFollow(smoothTime);
     }
 
     void Update()
@@ -115,7 +116,6 @@ public class PlayerView : MonoBehaviour
 
         RaycastHit hit;
 
-
         Debug.DrawRay(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position);
         // 人物中心 到 玩家相机hitPoint的 向量 之间是否有物体
         if (Physics.Raycast(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position, out hit, Vector3.Distance(hitPoint.transform.position, centerPoint.transform.position)))
@@ -150,33 +150,25 @@ public class PlayerView : MonoBehaviour
         /// 摄像头角度锁定
         /// </summary>
         float currentRotateX = centerPoint.transform.eulerAngles.x;
-
         //将unity修改后的旋转值恢复回来 ，也就是负数 保持原样
         if (currentRotateX > 180)
         {
             currentRotateX = currentRotateX - 360;//这样-5度还是-5度 而不是355！
         }
-
+        // 冻结z轴
+        playerCamera.transform.eulerAngles = new Vector3(playerCamera.transform.eulerAngles.x ,playerCamera.transform.eulerAngles.y,0);
         //限制角度
         if (currentRotateX >= XLimit)
         {
-            centerPoint.transform.localEulerAngles = Vector3.right * XLimit;
+            centerPoint.transform.localEulerAngles = new Vector3(XLimit, centerPoint.transform.localEulerAngles.y, 0);
             playerCamera.transform.eulerAngles = new Vector3(XLimit, centerPoint.transform.eulerAngles.y, 0);
-            CameraFollow(smoothTime / 8f);
             mouseX = 0;
         }
         else if (currentRotateX <= -XLimit)
         {
-            centerPoint.transform.localEulerAngles = Vector3.right * (360 - XLimit);
+            centerPoint.transform.localEulerAngles = new Vector3(-XLimit, centerPoint.transform.localEulerAngles.y, 0);
             playerCamera.transform.eulerAngles = new Vector3(360 - XLimit, centerPoint.transform.eulerAngles.y, 0);
-            CameraFollow(smoothTime / 8f);
             mouseX = 0;
-        }
-        else
-        {
-            centerPoint.transform.localEulerAngles = Vector3.right * centerPoint.transform.localEulerAngles.x;
-            playerCamera.transform.eulerAngles = new Vector3(centerPoint.transform.eulerAngles.x, centerPoint.transform.eulerAngles.y, 0);
-            CameraFollow(smoothTime);
         }
     }
 
@@ -185,12 +177,12 @@ public class PlayerView : MonoBehaviour
         /// <summary>
         /// 鼠标控制摄像头
         /// <summary>
-
         //镜头转向核心代码
         //人物旋转
-        playerPoint.transform.RotateAround(centerPoint.transform.position, Vector3.up, mouseX);
+        //playerPoint.transform.RotateAround(centerPoint.transform.position, Vector3.up, mouseX);
         //摄像头点位旋转
         centerPoint.transform.RotateAround(centerPoint.transform.position, centerPoint.transform.right, mouseY);
+        centerPoint.transform.RotateAround(centerPoint.transform.position, Vector3.up, mouseX);
         //摄像头自转
         playerCamera.transform.RotateAround(centerPoint.transform.position, centerPoint.transform.right, mouseY);
         playerCamera.transform.RotateAround(centerPoint.transform.position, Vector3.up, mouseX);
