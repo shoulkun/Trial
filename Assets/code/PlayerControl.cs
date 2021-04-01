@@ -13,12 +13,15 @@ public class PlayerControl : MonoBehaviour
     private Transform modelT;
     private Transform playerT;
     private Transform dirObjT;
+    private PlayerCast playerCast;
+
     // Start is called before the first frame update
     void Start()
     {
         playerT = GameObject.Find("player").transform;
         dirObjT = GameObject.Find("centerPoint").transform;
         modelT = GameObject.Find("playerModel").transform;
+        playerCast = GameObject.Find("playerCast").GetComponent<PlayerCast>();
     }
 
     // Update is called once per frame
@@ -75,7 +78,24 @@ public class PlayerControl : MonoBehaviour
 
         //只允许y轴旋转
         modelT.eulerAngles = new Vector3(0,modelT.eulerAngles.y,0);
+
+        Vector3 from = modelT.position;
+        Vector3 v3Dis = (dir * move) * moveSpeed * Time.deltaTime;
+        Vector3 to = from + v3Dis * 100;
+        // RaycastHit rh;
+
+        // Debug.DrawLine(from, to, Color.black);
+        // if (Physics.Linecast(from, to, out rh, LayerMask.GetMask("Default")))
+        // {
+        //     v3Dis = (dir * move) * 0 * Time.deltaTime;
+        // }
+
+        //移动方向即将发生碰撞
+        if (playerCast.isCast)
+        {
+            v3Dis = (dir * move) * 0 * Time.deltaTime;
+        }
         //移动
-        playerT.Translate((dir * move) * moveSpeed * Time.deltaTime);
+        playerT.Translate(v3Dis);
     }
 }

@@ -68,10 +68,10 @@ public class PlayerView : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        // 锁定视角角度
-        CameraLock();
         // 切换视角长度
         ChangeViewer();
+        // 锁定视角角度
+        CameraLock();
     }
 
     void Update()
@@ -124,7 +124,7 @@ public class PlayerView : MonoBehaviour
 
         Debug.DrawRay(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position);
         // 人物中心 到 玩家相机hitPoint的 向量 之间是否有物体
-        if (Physics.Raycast(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position, out hit, Vector3.Distance(hitPoint.transform.position, centerPoint.transform.position)))
+        if (Physics.Raycast(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position, out hit, Vector3.Distance(hitPoint.transform.position, centerPoint.transform.position), 0))
         {
             // 有物体 且该物体 在 摄像头与人物之间
             if (hit.collider.tag == "Untagged" && Vector3.Distance(hit.point, centerPoint.transform.position) <= Vector3.Distance(cameraPoint.transform.position, centerPoint.transform.position))
