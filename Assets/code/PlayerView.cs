@@ -82,7 +82,14 @@ public class PlayerView : MonoBehaviour
         //TargetAngle();
         // 旋转摄像头
         RotateCamera();
+        CorrectView();
+    }
 
+    void CorrectView()
+    {
+        /// <summary>
+        /// 修正视角
+        /// </summary>
         // 检测第一人称 摄像头是否到达指定位置
         if(defaultV == 0 && (playerCamera.transform.position == centerPoint.transform.position))
         {
@@ -100,7 +107,6 @@ public class PlayerView : MonoBehaviour
             //修正相机及碰撞点位置
         }
     }
-
     void ChangeViewer()
     {
         /// <summary>
@@ -124,7 +130,7 @@ public class PlayerView : MonoBehaviour
 
         Debug.DrawRay(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position);
         // 人物中心 到 玩家相机hitPoint的 向量 之间是否有物体
-        if (Physics.Raycast(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position, out hit, Vector3.Distance(hitPoint.transform.position, centerPoint.transform.position), 0))
+        if (Physics.Raycast(centerPoint.transform.position, hitPoint.transform.position - centerPoint.transform.position, out hit, Vector3.Distance(hitPoint.transform.position, centerPoint.transform.position),~(1<<10)))
         {
             // 有物体 且该物体 在 摄像头与人物之间
             if (hit.collider.tag == "Untagged" && Vector3.Distance(hit.point, centerPoint.transform.position) <= Vector3.Distance(cameraPoint.transform.position, centerPoint.transform.position))

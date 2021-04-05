@@ -1511,7 +1511,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1461636586}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: cameraPoint
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1526,7 +1526,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1461636585}
   m_LocalRotation: {x: 0.10798951, y: -0, z: -0, w: 0.99415207}
-  m_LocalPosition: {x: 0.65, y: 1.55, z: -3.66}
+  m_LocalPosition: {x: 1.206, y: 1.55, z: -3.66}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1741948607}
@@ -1932,7 +1932,7 @@ GameObject:
   - component: {fileID: 1595391877}
   - component: {fileID: 1595391878}
   - component: {fileID: 1595391874}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1952,6 +1952,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
+  ViewScale: 10
   turnArroundSpeed: 10
 --- !u!4 &1595391877
 Transform:
@@ -2133,7 +2134,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1628672297}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: hitPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2148,7 +2149,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1628672296}
   m_LocalRotation: {x: 0.10798951, y: -0, z: -0, w: 0.99415207}
-  m_LocalPosition: {x: 0.6500001, y: 1.55, z: -3.6600003}
+  m_LocalPosition: {x: 1.2059999, y: 1.55, z: -3.6600003}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1741948607}
@@ -2377,7 +2378,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1741948607}
   - component: {fileID: 1741948608}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: centerPoint
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2414,7 +2415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 4.5
   XLimit: 60
-  smoothTime: 100
+  smoothTime: 60
   OffsetRayLen: {x: 0, y: 0, z: 0}
 --- !u!1001 &1789137169
 PrefabInstance:
@@ -2512,7 +2513,7 @@ GameObject:
   - component: {fileID: 1806218198}
   - component: {fileID: 1806218197}
   - component: {fileID: 1806218196}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: playerModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

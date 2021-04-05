@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,10 +7,11 @@ public class PlayerControl : MonoBehaviour
 {
     private float ws, ad;               //移动方向
     public float moveSpeed = 2;         //移动速度
-
+    public float ViewScale = 10f;       //放大缩小速度
     public float turnArroundSpeed = 10; //转身速度
     private Quaternion dir; //移动方向向量 最终移动计算结果
     private Vector3 move; //按键检测
+    private Camera PlayerCamera;
     private Transform modelT;
     private Transform playerT;
     private Transform dirObjT;
@@ -18,6 +20,7 @@ public class PlayerControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        PlayerCamera = GameObject.Find("camera").GetComponent<Camera>();
         playerT = GameObject.Find("player").transform;
         dirObjT = GameObject.Find("centerPoint").transform;
         modelT = GameObject.Find("playerModel").transform;
@@ -52,6 +55,14 @@ public class PlayerControl : MonoBehaviour
             ad = 1;
         }
 
+        if(Input.GetMouseButton(1))
+        {
+            PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, 40, ViewScale * Time.deltaTime);
+        }
+        else
+        {
+            PlayerCamera.fieldOfView = Mathf.Lerp(PlayerCamera.fieldOfView, 80, ViewScale *  Time.deltaTime);
+        }
         //让移动方向参考系 朝向视角方向为正面
         move = new Vector3(ad, 0, ws).normalized;
         dir = Quaternion.Euler(new Vector3(0, dirObjT.eulerAngles.y, dirObjT.eulerAngles.z) - playerT.eulerAngles).normalized;
